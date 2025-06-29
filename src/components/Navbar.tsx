@@ -36,13 +36,6 @@ export default function NavLinks() {
               Sign-in
             </Link> */}
             <SignedIn>
-              <SignOutButton>
-                <button
-                  className="hover:cursor-pointer text-slate-300 border border-slate-600 px-3 py-1 hover:text-white transition-all duration-300 ease-in-out font-medium"
-                >
-                  Sign Out
-                </button>
-              </SignOutButton>
               <UserButton />
             </SignedIn>
 

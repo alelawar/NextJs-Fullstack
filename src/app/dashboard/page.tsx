@@ -5,6 +5,7 @@ export default async function DashboardPage() {
     const authObj = await auth()
     const userObj = await currentUser()
 
+    // BUAT NGE CEK AUTH CLERK YA
     log(authObj)
     log(userObj)
 

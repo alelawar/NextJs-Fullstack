@@ -6,14 +6,20 @@ export const ActionUser = () => {
   const { isLoaded, userId } = useAuth()
 
   // Kalau auth belum siap, jangan render apa-apa dulu
-  if (!isLoaded) return null
+  if (!isLoaded) return (
+    <Button
+      href="#"
+      label="Loading..."
+      icon=""
+    />
+  )
 
   // Kalau user sudah login
   if (userId) {
     return (
       <Button
         href="/articles/create"
-        label="Create Articles"
+        label="Buat Artikel"
         icon="bi bi-pencil"
       />
     )

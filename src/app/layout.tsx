@@ -38,11 +38,9 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <NavLinks />
-          <main className="md:min-h-[80dvh] min-h-[90dvh]  max-w-7xl mx-auto flex justify-center items-center">
+            <NavLinks />
             {children}
-          </main>
-          <Footer />
+            <Footer />
         </body>
       </html>
     </ClerkProvider>
