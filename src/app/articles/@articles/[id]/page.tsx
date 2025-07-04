@@ -16,13 +16,13 @@ export default async function DetailArticle({ params }: {
     }).format(new Date(article.createdAt))
 
     return (
-        <div className="w-full h-fit border border-white rounded-lg py-8 px-5">
-            <h1 className="text-center mb-8 font-bold text-4xl">
+        <div className="md:w-full h-fit border border-white rounded-lg py-5 px-2 md:py-8 md:px-5 mx-5 mt-10">
+            <h1 className="text-center mb-3 md:mb-8 font-bold text-2xl md:text-4xl">
                 {article.title}
             </h1>
 
             <div className="mb-1 my-0.5 text-xs md:text-base flex items-center gap-4">
-                <div className="relative w-7 h-7 rounded-full overflow-hidden">
+                <div className="relative size-7 rounded-full overflow-hidden">
                     <Image
                         src={article.authorId.imageUrl}
                         alt={article.authorId.name}
@@ -32,7 +32,7 @@ export default async function DetailArticle({ params }: {
                 </div>
 
                 <div className="flex flex-col">
-                    <a href="/name" className="font-medium">{article.authorId.name}</a>
+                    <a href={`/user/${article.authorId._id}`} className="font-medium">{article.authorId.name}</a>
                     <p className="text-slate-400 text-xs">{createdAt}</p>
                 </div>
 

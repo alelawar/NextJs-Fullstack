@@ -1,22 +1,30 @@
-import { getAllArticles } from "../../../../services/articlesServices"
 import ArticleList from "@/components/ListArticle";
-import CreateArticle from "./form";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { Button } from "@/components/Button";
+import { getAllArticles } from "../../../../../services/articlesServices";
 
-export default async function ArticlesPage({ searchParams }: {
+export default async function ArticleUser({ params, searchParams }: {
+    params: Promise<{ id: string, }>;
     searchParams: {
-        page?: string
-        search?: string
-    }
+        search?: string;
+        page?: string;
+    };
 }) {
+    // await new Promise(resolve => {
+    //     setTimeout(resolve, 1700)
+    // })
+    const { id } = await params
     const page = parseInt(searchParams.page || "1", 10);
     const search = searchParams.search || "";
 
-    const { articles, totalPages } = await getAllArticles({ page, search: search || undefined });
+
+    const { articles, totalPages, total } = await getAllArticles({
+        authorId: id,
+        search: search || undefined,
+        page
+    })
     return (
         <>
-            <div className="px-3 md:mx-8 mb-6 mt-10">
+            <p className="mt-3 px-5 md:px-8"><span className="underline">{articles.length}</span> Artikel Telah Dibuat</p>
+            <div className="mx-8 mb-6 mt-10">
                 <form action="" method="GET" className="flex gap-2">
                     <input
                         type="text"
@@ -33,18 +41,6 @@ export default async function ArticlesPage({ searchParams }: {
                     </button>
                 </form>
             </div>
-            <div className="md:mx-5">
-                <SignedIn>
-                    <CreateArticle />
-                </SignedIn>
-                <SignedOut>
-                    <Button
-                        href="/sign-in"
-                        label="Buat Artikel"
-                        icon="bi bi-person"
-                    />
-                </SignedOut>
-            </div>
             <ArticleList dataArticles={articles} />
             {/* Pagination UI */}
             <div className="flex gap-2 mt-4 mx-8 mb-10">
@@ -59,5 +55,5 @@ export default async function ArticlesPage({ searchParams }: {
                 ))}
             </div>
         </>
-    );
+    )
 }

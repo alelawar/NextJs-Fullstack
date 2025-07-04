@@ -1,5 +1,5 @@
 "use client";
-import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton, } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton, } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -7,7 +7,7 @@ export default function NavLinks() {
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/articles", label: "Articles" },
-    { href: "/user-profile", label: "Profile" },
+    { href: "/profile", label: "Profile" },
     //  { href: "/sign-in", label: "Sign-in" }, 
   ];
 

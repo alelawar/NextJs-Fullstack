@@ -20,7 +20,7 @@ export default async function CategoriesNav() {
 
                     >
                         <Link
-                            href={`/articles/${category.slug}`}
+                            href={`/articles/category/${category.slug}`}
                         >
                             <span className="mr-3">🌏</span>{category.name}
                         </Link>
