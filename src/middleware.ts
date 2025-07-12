@@ -1,26 +1,33 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)", "/api/articles(.*)", "/articles(.*)", "/user(.*)"]);
+const isPublicRoute = createRouteMatcher(["/", "/sign-in(.*)", "/sign-up(.*)", "/api/articles(.*)", "/articles(.*)", "/user(.*)"])
 const isAdminRoute = createRouteMatcher(["/admin(.*)"])
+const isModRoute = createRouteMatcher(["/dashboard(.*)"])
 
 export default clerkMiddleware(async (auth, req) => {
   const { userId, redirectToSignIn } = await auth()
-  if (
-    isAdminRoute(req) &&
-    (await auth()).sessionClaims?.metadata?.role != "admin"
-  ) {
+
+  // Get user role from session claims
+  const userRole = (await auth()).sessionClaims?.metadata?.role
+
+  // Check admin route access
+  if (isAdminRoute(req) && userRole !== "admin") {
     const url = new URL("/", req.url);
     return NextResponse.redirect(url);
   }
 
-  if (!userId && !isPublicRoute(req)) {
-    // Add custom logic to run before redirecting
+  // Check moderator route access (moderator and admin can access)
+  if (isModRoute(req) && !["moderator", "admin"].includes(userRole ?? "")) {
+    const url = new URL("/", req.url);
+    return NextResponse.redirect(url);
+  }
 
+  // Check if user is authenticated for private routes
+  if (!userId && !isPublicRoute(req)) {
     return redirectToSignIn();
   }
 })
-
 
 export const config = {
   matcher: [

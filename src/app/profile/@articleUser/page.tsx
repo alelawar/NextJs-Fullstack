@@ -1,41 +1,47 @@
-import { getAllArticles } from "../../../../services/articlesServices"
+"use server"
 import ArticleList from "@/components/ListArticle";
-import CreateArticle from "./form";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import { Button } from "@/components/Button";
+import { getAllArticles } from "../../../../services/articlesServices";
 import GlobalSearch from "@/components/GlobalSearch";
+import { currentUser } from "@clerk/nextjs/server";
 
-export default async function ArticlesPage({ searchParams }: {
+
+export default async function ArticleUserProfile({ searchParams }: {
     searchParams: Promise<{
-        page?: string
-        search?: string
-    }>
+        search?: string;
+        page?: string;
+    }>;
 }) {
+    // await new Promise(resolve => {
+    //     setTimeout(resolve, 1700)
+    // })
+    const userObj = await currentUser()
+    const user = {
+        email: userObj?.emailAddresses?.[0]?.emailAddress ?? "-",
+        id: userObj?.id
+    };
+
     const resolvedSearchParams = await searchParams
 
     const page = parseInt(resolvedSearchParams.page || "1", 10);
     const search = resolvedSearchParams.search || "";
 
-    const { articles, totalPages } = await getAllArticles({ page, search: search || undefined });
+    const { articles, totalPages } = await getAllArticles({
+        userId: user.id,
+        search: search || undefined,
+        page
+    })
     return (
         <>
             <GlobalSearch
                 placeholder="Cari artikel..."
                 preserveParams={true}
             />
-            <div className="md:mx-5">
-                <SignedIn>
-                    <CreateArticle />
-                </SignedIn>
-                <SignedOut>
-                    <Button
-                        href="/sign-in"
-                        label="Buat Artikel"
-                        icon="bi bi-person"
-                    />
-                </SignedOut>
-            </div>
-            <ArticleList dataArticles={articles} />
+            <ArticleList
+                dataArticles={articles}
+                deleteButton={true}
+                editButton={true}
+                userId={user.id}
+            />
             {/* Pagination UI */}
             <div className="flex gap-2 mt-4 mx-8 mb-10">
                 {Array.from({ length: totalPages }, (_, i) => (
@@ -49,5 +55,5 @@ export default async function ArticlesPage({ searchParams }: {
                 ))}
             </div>
         </>
-    );
+    )
 }

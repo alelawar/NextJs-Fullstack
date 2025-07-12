@@ -8,6 +8,7 @@ import { Category } from '../../../../models/Category';
 
 
 export async function POST(req: Request) {
+  "use server"
   try {
     await connectDB();
     const body = await req.json();

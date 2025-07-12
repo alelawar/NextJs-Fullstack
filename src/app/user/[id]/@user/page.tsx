@@ -1,4 +1,3 @@
-import { log } from "console";
 import { getUserDetail } from "../../../../../services/articlesServices";
 import Image from "next/image";
 

@@ -1,11 +1,16 @@
 import Image from 'next/image'
 import { getDetailArticle } from '../../../../../services/articlesServices'
+import { notFound } from 'next/navigation'
 
 export default async function DetailArticle({ params }: {
     params: Promise<{ id: string }>
 }) {
     const { id } = await params
     const article = await getDetailArticle(id)
+
+    if(!article  ) return(
+        notFound()
+    )
 
     // Ubah createdAt ke tanggal lokal Indonesia
     const createdAt = new Intl.DateTimeFormat('id-ID', {

@@ -1,8 +1,8 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
+import { editArticleProps} from "@/types/types";
 
 type Category = {
     id: string;
@@ -10,10 +10,12 @@ type Category = {
     slug: string;
 };
 
-export default function CreateArticle() {
+export default function CreateArticle({ articleEdit, label = "Buat Artikel", mt = true }:
+    { articleEdit?: editArticleProps, label?: string, mt?: boolean }
+) {
     const [modal, setModal] = useState(false);
     const [categories, setCategories] = useState<Category[]>([]);
-    const { pending } = useFormStatus();
+    const [isSubmitting, setIsSubmitting] = useState(false); // State untuk loading
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [categorySlug, setCategorySlug] = useState("");
@@ -33,13 +35,23 @@ export default function CreateArticle() {
         fetchCategories();
     }, []);
 
+    useEffect(() => {
+        if (articleEdit) {
+            setTitle(articleEdit.title);
+            setContent(articleEdit.content);
+            setCategorySlug(articleEdit.categoryId.slug);
+        }
+    }, [articleEdit])
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
         setSuccess(null);
+        setIsSubmitting(true); // Set loading state
 
         if (!user) {
             setError("User belum login.");
+            setIsSubmitting(false);
             return;
         }
 
@@ -55,11 +67,16 @@ export default function CreateArticle() {
         };
 
         try {
-            const res = await fetch("/api/articles", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(articleData),
-            });
+            const res = await fetch(
+                articleEdit ? `/api/articles/${articleEdit._id}` : "/api/articles",
+                {
+                    method: articleEdit ? "PUT" : "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(articleData),
+                }
+            );
 
             const result = await res.json();
 
@@ -68,7 +85,14 @@ export default function CreateArticle() {
                 return;
             }
 
-            setSuccess("Artikel berhasil dibuat!");
+            setSuccess(articleEdit ? "Artikel berhasil diperbarui!" : "Artikel berhasil dibuat!");
+
+            if (!articleEdit) {
+                // Reset form fields if creating a new article
+                setTitle("");
+                setContent("");
+                setCategorySlug(categories[0]?.slug || "");
+            }
 
             // Reset form
             setTitle("");
@@ -80,20 +104,22 @@ export default function CreateArticle() {
                 setModal(false);
                 setSuccess(null);
                 router.refresh()
-            }, 2000);
+            }, 500);
         } catch (err) {
             console.error("Gagal submit artikel:", err);
             setError("Gagal terhubung ke server.");
-        }   
+        } finally {
+            setIsSubmitting(false); // Reset loading state
+        }
     };
 
     return (
-        <div className="mt-10 px-3 md:px-8">
+        <div className={`${mt ? "mt-10 md:px-8" : ""} px-3`}>
             <button
                 onClick={() => setModal(true)}
                 className="text-sm md:text-base px-3 py-1 border border-white hover:rounded-md hover:text-blue-600 cursor-pointer"
             >
-                Buat Artikel
+                {label}
             </button>
 
             {modal && (
@@ -123,6 +149,7 @@ export default function CreateArticle() {
                                     className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300"
                                     placeholder="Masukkan judul"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
@@ -132,6 +159,7 @@ export default function CreateArticle() {
                                     className="w-full border px-3 py-2 rounded bg-slate-950"
                                     value={categorySlug}
                                     onChange={(e) => setCategorySlug(e.target.value)}
+                                    disabled={isSubmitting}
                                 >
                                     {categories.map((cat) => (
                                         <option key={cat.slug} value={cat.slug}>
@@ -149,15 +177,16 @@ export default function CreateArticle() {
                                     className="w-full border px-3 py-2 rounded focus:outline-none focus:ring focus:border-blue-300 h-32"
                                     placeholder="Masukkan isi konten"
                                     required
+                                    disabled={isSubmitting}
                                 />
                             </div>
 
                             <button
                                 type="submit"
-                                className="bg-blue-600 block w-full text-white px-4 py-2 rounded hover:bg-blue-700"
-                                disabled={pending}
+                                className="bg-blue-600 block w-full text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-600"
+                                disabled={isSubmitting}
                             >
-                                {pending ? "Mengirim..." : "Buat Artikel"}
+                                {isSubmitting ? "Mengirim..." : articleEdit ? "Simpan Perubahan" : "Buat Artikel"}
                             </button>
                         </form>
                     </div>

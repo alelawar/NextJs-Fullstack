@@ -32,8 +32,9 @@ export interface IUser extends Document {
 
 export interface FilteredParams {
   authorId?: string;
+  userId?: string;
   search?: string;
-  page?: number; 
+  page?: number;
   limit?: number
 }
 
@@ -70,6 +71,65 @@ export interface LayoutProps {
   categoriesNav?: React.ReactNode;
 }
 
+export type ArticleListProps = {
+  dataArticles: Article[];
+  deleteButton?: boolean;
+  editButton?: boolean;
+  userId?: string
+  handleDelete?: (id: string) => void;
+};
 
+export type DeleteArticleButtonProps = {
+  articleId: string;
+  articleTitle: string;
+  onDelete: (formData: FormData) => void;
+}
+
+interface ArticleDataChart {
+  _id: string;
+  count: number;
+}
+
+interface ChartProps {
+  data: ArticleDataChart[];
+}
+
+export interface ReusableChartProps extends ChartProps {
+  title?: string;
+  linkText?: string;
+  linkHref?: string;
+  barColor?: string;
+  height?: number;
+  dateFormat?: boolean; // apakah data perlu diformat tanggal atau engga
+  dataKeyX?: string; // field yang dipake buat X axis
+  dataKeyY?: string; // field yang dipake buat Y axis
+  tooltipLabel?: string; // label buat tooltip
+}
+
+
+interface CategoryData {
+  _id: string;
+  count: number;
+}
+
+export interface CategoryChartProps {
+  data: CategoryData[];
+}
+
+export interface ButtonAdminProps {
+  label: string;
+  sending?: string;
+}
+
+export interface editArticleProps {
+  _id: string;
+  title: string;
+  content: string;
+  categoryId: {
+    _id: string;
+    name: string;
+    slug: string;
+  };
+}
 
 export type Roles = "admin" | "moderator"
